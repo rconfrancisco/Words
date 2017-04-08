@@ -9,6 +9,8 @@ CFLAGS = -Wall -g -fpermissive -std=c++11
 # define the executable file 
 TARGET = Word
 
+install: all
+
 all: $(TARGET)
 
 Word: Word.C

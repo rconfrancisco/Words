@@ -15,16 +15,26 @@ struct Node_t {
     if(this->count < rhs.count) return true;
     return false;
   }
+  Node_t (const Node_t& rhs): count(rhs.count), word(rhs.word) {}
+  explicit Node_t (const std::string& in_word) : count(0), word(in_word) {}
+  Node_t (const int cnt, const std::string& in_word) 
+    : count(cnt), word(in_word) {}
+
+  Node_t& operator=(const Node_t& rhs) {
+    if(this != &rhs) {
+      this->count = rhs.count;
+      this->word  = rhs.word;
+    }
+    return *this;
+  }
+
 };
 
 typedef std::pair<std::string, int> NodePair_t;
 
-typedef std::vector<std::string> Vector_t;
 typedef std::unordered_map<std::string, int> Map_t;
 typedef Map_t::iterator                      MapItr_t;
 typedef std::priority_queue<Node_t, std::vector<Node_t> > PriorityQueue_t;
-
-static PriorityQueue_t myMaxHeap;
 
 void countWord(Map_t& myMap, const std::string& word) {
   MapItr_t itr = myMap.find(word);
@@ -37,24 +47,34 @@ void countWord(Map_t& myMap, const std::string& word) {
   return;
 }
 
-void makeHeap(const NodePair_t& pair) {
-  Node_t node;
-  node.word  = pair.first;
-  node.count = pair.second;
-  myMaxHeap.push(node);
-  return;
-}
+class MaxHeap_t {
+  
+private:
 
-void printHeap(PriorityQueue_t& max_heap, const int max_count) {
+public:
 
-  int count=0;
-  while(!myMaxHeap.empty() && (count < max_count)) {
-    std::cout << myMaxHeap.top().word << " - " << myMaxHeap.top().count << std::endl;
-    myMaxHeap.pop();
-    ++count;
+  PriorityQueue_t m_heap;
+
+  MaxHeap_t(){};
+  void operator() (const NodePair_t& pair) {
+    Node_t node(pair.second, pair.first);
+    m_heap.push(node);
+    return;
   }
-  return;
-}
+
+  void print_heap(const int max_count) {
+
+    int count = 0;
+    while((!m_heap.empty()) && (count < max_count)) {
+      std::cout << m_heap.top().word  << " - " 
+		<< m_heap.top().count << std::endl;
+      m_heap.pop();
+      ++count;
+    }
+    return;
+  }
+  
+};
 
 std::string& normalizeWord(std::string& word) {
   for(size_t i=0; i < word.length(); ++i) {
@@ -62,7 +82,6 @@ std::string& normalizeWord(std::string& word) {
   }
   return word;
 }
-
 
 int main(int argc, char* argv[]) {
   
@@ -76,7 +95,8 @@ int main(int argc, char* argv[]) {
     countWord(myMap, normalizeWord(word));
   }
 
-  std::for_each(myMap.begin(), myMap.end(), makeHeap);
-  printHeap(myMaxHeap, maxCount);
+  MaxHeap_t myMaxHeap;
+  myMaxHeap = std::for_each(myMap.begin(), myMap.end(), myMaxHeap);
+  myMaxHeap.print_heap(maxCount);
   return 0;
 }
