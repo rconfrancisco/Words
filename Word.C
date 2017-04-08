@@ -12,7 +12,7 @@ struct Node_t {
   int count;
   std::string word;
   bool operator<(const Node_t& rhs) const {
-    if(this->count < rhs.count) return true;
+    if(this->count > rhs.count) return true;
     return false;
   }
   Node_t (const Node_t& rhs): count(rhs.count), word(rhs.word) {}
@@ -34,7 +34,7 @@ typedef std::pair<std::string, int> NodePair_t;
 
 typedef std::unordered_map<std::string, int> Map_t;
 typedef Map_t::iterator                      MapItr_t;
-typedef std::priority_queue<Node_t, std::vector<Node_t> > PriorityQueue_t;
+typedef std::vector<Node_t>                  NodeHeap_t;
 
 void countWord(Map_t& myMap, const std::string& word) {
   MapItr_t itr = myMap.find(word);
@@ -47,29 +47,38 @@ void countWord(Map_t& myMap, const std::string& word) {
   return;
 }
 
-class MaxHeap_t {
+class MinHeap_t {
   
 private:
+  size_t m_topWords;
 
 public:
 
-  PriorityQueue_t m_heap;
+  NodeHeap_t m_heap;
 
-  MaxHeap_t(){};
-  void operator() (const NodePair_t& pair) {
-    Node_t node(pair.second, pair.first);
-    m_heap.push(node);
+  void setTopWords(const size_t num) {
+    m_topWords = num;
     return;
   }
 
-  void print_heap(const int max_count) {
+  MinHeap_t(const size_t num=5) : m_topWords(num){};
 
-    int count = 0;
-    while((!m_heap.empty()) && (count < max_count)) {
-      std::cout << m_heap.top().word  << " - " 
-		<< m_heap.top().count << std::endl;
-      m_heap.pop();
-      ++count;
+  void operator() (const NodePair_t& pair) {
+    Node_t node(pair.second, pair.first);
+    m_heap.push_back(node);
+    std::push_heap(m_heap.begin(),  m_heap.end());
+    if(m_heap.size() > m_topWords) {
+      std::pop_heap(m_heap.begin(), m_heap.end());
+      m_heap.pop_back();
+    }
+    return;
+  }
+
+  void print_heap() {
+    int len=m_heap.size();
+    for(int i=len-1; i >=0; --i) {
+      std::cout << m_heap[i].word  << " - " 
+		<< m_heap[i].count << std::endl;
     }
     return;
   }
@@ -95,8 +104,8 @@ int main(int argc, char* argv[]) {
     countWord(myMap, normalizeWord(word));
   }
 
-  MaxHeap_t myMaxHeap;
-  myMaxHeap = std::for_each(myMap.begin(), myMap.end(), myMaxHeap);
-  myMaxHeap.print_heap(maxCount);
+  MinHeap_t myMinHeap(maxCount);
+  myMinHeap = std::for_each(myMap.begin(), myMap.end(), myMinHeap);
+  myMinHeap.print_heap();
   return 0;
 }
