@@ -1,12 +1,60 @@
 //Sample program to print out 10 most popular words in a file.  
 //Reading from stdin.
 #include <iostream>
+#include <istream>
+#include <fstream>
 #include <unordered_map>
 #include <string>
 #include <vector>
 #include <queue>
 #include <algorithm>
 #include <ctype.h>
+#include <unistd.h>
+
+using namespace std;
+
+constexpr int      default_words=10;
+static int         maxWords=default_words;
+static std::string filename;
+
+void usage(char* prog) {
+
+  std::cout << prog 
+	    << "[options]\n"
+	    << "-f filename - required\n" 
+	    << "-n words - default " << default_words << "\n"
+	    << "-h help this menu\n";
+
+  exit(0);
+}
+
+void menu(int argc, char* argv[]) {
+
+  int ch=0;
+  while ((ch = getopt(argc, argv, "n:f:?Hh")) != -1) {
+    switch (ch) {
+    case 'n':
+      maxWords = atoi(optarg);
+      if(maxWords <=0) maxWords = default_words;
+      break;
+      
+    case 'f':
+      filename.assign(optarg);
+      break;
+
+    case '?':
+    case 'h':
+    case 'H':
+    default:
+      usage(argv[0]);
+      break;
+    }
+  }
+  if(filename.length() == 0) {
+    usage(argv[0]);
+  }
+  return;
+}
 
 struct Node_t {
   int count;
@@ -15,19 +63,9 @@ struct Node_t {
     if(this->count > rhs.count) return true;
     return false;
   }
-  Node_t (const Node_t& rhs): count(rhs.count), word(rhs.word) {}
+  Node_t () : count(0) {};
   explicit Node_t (const std::string& in_word) : count(0), word(in_word) {}
-  Node_t (const int cnt, const std::string& in_word) 
-    : count(cnt), word(in_word) {}
-
-  Node_t& operator=(const Node_t& rhs) {
-    if(this != &rhs) {
-      this->count = rhs.count;
-      this->word  = rhs.word;
-    }
-    return *this;
-  }
-
+  Node_t (const int cnt, const std::string& in_word) : count(cnt), word(in_word) {}
 };
 
 typedef std::pair<std::string, int> NodePair_t;
@@ -94,17 +132,19 @@ std::string& normalizeWord(std::string& word) {
 
 int main(int argc, char* argv[]) {
   
-  int maxCount=0;
-  if(argc > 1) maxCount = atoi(argv[1]);
-  if(maxCount < 1) maxCount=10;
+  menu(argc, argv);
 
   Map_t       myMap;
   std::string word;
-  while (std::cin >> word) {
+
+  ifstream ifs;
+  ifs.open(filename);
+
+  while (ifs >> word) {
     countWord(myMap, normalizeWord(word));
   }
 
-  MinHeap_t myMinHeap(maxCount);
+  MinHeap_t myMinHeap(maxWords);
   myMinHeap = std::for_each(myMap.begin(), myMap.end(), myMinHeap);
   myMinHeap.print_heap();
   return 0;
