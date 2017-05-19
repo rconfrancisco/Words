@@ -8,10 +8,7 @@
 #include <vector>
 #include <queue>
 #include <algorithm>
-#include <ctype.h>
 #include <unistd.h>
-
-using namespace std;
 
 constexpr int      default_words=10;
 static int         maxWords=default_words;
@@ -137,7 +134,7 @@ int main(int argc, char* argv[]) {
   Map_t       myMap;
   std::string word;
 
-  ifstream ifs;
+  std::ifstream ifs;
   ifs.open(filename);
 
   while (ifs >> word) {
