@@ -142,7 +142,9 @@ int main(int argc, char* argv[]) {
   }
 
   MinHeap_t myMinHeap(maxWords);
-  myMinHeap = std::for_each(myMap.begin(), myMap.end(), myMinHeap);
+  std::for_each(myMap.begin(), myMap.end(), [&] (const NodePair_t& pair) { 
+      myMinHeap.operator()(pair);
+    } );
   myMinHeap.print_heap();
   return 0;
 }
