@@ -12,7 +12,6 @@ Usage:
 -n words - default 10
 <br> 
 -h help this menu
-The first and only parameter is how many words you wish to display.
 <br>
 The program reads each word, normalizes it, puts into a hash map (trie would be faster)
 <br>
