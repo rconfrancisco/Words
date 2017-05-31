@@ -65,11 +65,10 @@ struct Node_t {
   Node_t (const int cnt, const std::string& in_word) : count(cnt), word(in_word) {}
 };
 
-typedef std::pair<std::string, int> NodePair_t;
-
-typedef std::unordered_map<std::string, int> Map_t;
-typedef Map_t::iterator                      MapItr_t;
-typedef std::vector<Node_t>                  NodeHeap_t;
+using NodePair_t = std::pair<std::string, int>;
+using Map_t      = std::unordered_map<std::string, int>;
+using MapItr_t   = Map_t::iterator;
+using NodeHeap_t = std::vector<Node_t>;
 
 void countWord(Map_t& myMap, const std::string& word) {
   MapItr_t itr = myMap.find(word);
