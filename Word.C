@@ -1,12 +1,10 @@
 //Sample program to print out 10 most popular words in a file.  
 //Reading from stdin.
 #include <iostream>
-#include <istream>
 #include <fstream>
 #include <unordered_map>
 #include <string>
 #include <vector>
-#include <queue>
 #include <algorithm>
 #include <unistd.h>
 
@@ -141,9 +139,10 @@ int main(int argc, char* argv[]) {
   }
 
   MinHeap_t myMinHeap(maxWords);
-  std::for_each(myMap.begin(), myMap.end(), [&] (const NodePair_t& pair) { 
-      myMinHeap.operator()(pair);
-    } );
+  std::for_each(myMap.begin(), 
+		myMap.end(), 
+		[&myMinHeap] (const NodePair_t& pair) { 
+		  myMinHeap.operator()(pair); } );
   myMinHeap.print_heap();
   return 0;
 }
