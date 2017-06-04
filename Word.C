@@ -88,12 +88,7 @@ public:
 
   NodeHeap_t m_heap;
 
-  void setTopWords(const size_t num) {
-    m_topWords = num;
-    return;
-  }
-
-  MinHeap_t(const size_t num=5) : m_topWords(num){};
+  explicit MinHeap_t(const size_t num=5) : m_topWords(num){};
 
   void operator() (const NodePair_t& pair) {
     Node_t node(pair.second, pair.first);
